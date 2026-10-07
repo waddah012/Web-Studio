@@ -69,7 +69,7 @@ export function mountWorkspace({ store, notify, onOpenWebsite }) {
     const file = event.target.files[0];
     if (!file) return;
     try {
-      if (file.size > 2_000_000) throw new Error('Choose a backup smaller than 2 MB.');
+      if (file.size > 50_000_000) throw new Error('Choose a backup smaller than 50 MB.');
       const text = await file.text();
       parseBackup(text);
       if (window.confirm('Replace this workspace with the imported backup? Export your current projects first to keep them.')) {

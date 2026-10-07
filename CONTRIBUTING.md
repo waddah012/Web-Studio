@@ -8,7 +8,7 @@ For each change:
 
 1. Make the smallest complete change that implements the behavior.
 2. Add regression coverage for changed business rules or serialization contracts.
-3. Run `npm run check` and `git diff --check`.
+3. Run `npm run check` and `git diff --check`. Run `npm run test:browser` for editor or rendering changes (install Chromium with `npx playwright install chromium` first).
 4. Check the interface in a browser at desktop and narrow widths when changing UI.
 5. Update usage documentation or an architecture decision when behavior or boundaries change.
 

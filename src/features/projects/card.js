@@ -1,6 +1,7 @@
 export function projectCard(project, onToggle, onEdit, onBuild) {
   const article = document.createElement('article');
   article.className = 'project-card';
+  article.dataset.projectId = project.id;
   const visual = document.createElement('div');
   visual.className = `project-visual ${['lavender', 'peach', 'green'].includes(project.theme) ? project.theme : 'green'}`;
   const symbol = document.createElement('span');

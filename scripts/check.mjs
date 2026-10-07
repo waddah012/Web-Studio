@@ -12,5 +12,5 @@ async function checkDirectory(directory) {
     }
   }
 }
-for (const directory of ['src', 'scripts', 'tests']) await checkDirectory(directory);
+for (const directory of ['src', 'scripts', 'tests', 'browser-tests']) await checkDirectory(directory);
 console.log('JavaScript syntax checks passed.');

@@ -23,9 +23,11 @@ export function createProjectStore(storage, { onStorageError = () => {}, id = ()
   const listeners = new Set();
   function commit(next) {
     projects = next;
+    let persisted = true;
     try { storage.setItem(STORAGE_KEY, JSON.stringify(projects)); }
-    catch { onStorageError('Changes could not be saved. Export a backup before closing this tab.'); }
+    catch { persisted = false; onStorageError('Changes could not be saved. Export a backup before closing this tab.'); }
     for (const listener of listeners) listener();
+    return persisted;
   }
   return {
     getProjects: () => structuredClone(projects),
@@ -43,7 +45,7 @@ export function createProjectStore(storage, { onStorageError = () => {}, id = ()
     },
     saveWebsite(projectId, website) {
       if (!projects.some(project => project.id === projectId)) throw new Error('This project no longer exists.');
-      commit(projects.map(project => project.id === projectId ? { ...project, website: normalizeWebsite(website) } : project));
+      return commit(projects.map(project => project.id === projectId ? { ...project, website: normalizeWebsite(website) } : project));
     },
     toggle(projectId) { commit(projects.map(project => project.id === projectId ? { ...project, status: project.status === 'Ready' ? 'In progress' : 'Ready' } : project)); },
     remove(projectId) { commit(projects.filter(project => project.id !== projectId)); },

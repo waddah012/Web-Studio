@@ -18,8 +18,12 @@ src/
       model.js                    Website normalization and field limits
       render.js                   Escaping and standalone HTML generation
       controller.js               Editor form, preview, save, export, device controls
+      sections.js                 Section schema, defaults, ordering, image validation
+      section-controls.js         Accessible section fields and actions
+      history.js                  Bounded snapshot history with grouped typing
   infrastructure/
     project-storage.js            Browser storage access and saved-data recovery
+    draft-storage.js              Unsaved page drafts separate from saved projects
   shared/
     browser.js                    DOM lookup, downloads, status notifications
 scripts/
@@ -27,6 +31,7 @@ scripts/
   build.mjs                       Static distribution assembly
   check.mjs                       Recursive JavaScript syntax checks
 tests/                            Behavioral and architecture checks
+browser-tests/                    Desktop/mobile workflow and accessibility checks
 docs/
   ARCHITECTURE.md                  Responsibilities, data flow, extension points
   REFERENCES.md                   Repository references and applied ideas
@@ -79,7 +84,7 @@ flowchart LR
 
 A project has `id`, `name`, `description`, `type`, `status`, `theme`, and `symbol`. A saved website is optional. Project names are limited to 60 characters and descriptions to 180; types and statuses use fixed allowed values. Project identifiers must be unique in imported workspaces.
 
-Website data contains a template key, headline, tagline, description, button text, contact email, accent color, and background color. The model supplies missing defaults, limits text length, and accepts six-digit hexadecimal colors. The renderer escapes user text and uses a validated email address for contact links.
+Website data contains a template key, headline, tagline, description, button text, contact email, brand, navigation contact label, footer text, colors, and ordered sections. The model supplies missing defaults, limits text length, and accepts six-digit hexadecimal colors. The renderer escapes user text and uses a validated email address for contact links.
 
 Exports use `{ version: 1, projects: [...] }`. Legacy array backups remain accepted. Local persistence retains the existing array format to preserve already saved workspaces. Unknown future backup versions must be rejected rather than silently interpreted as the current format.
 
@@ -90,7 +95,7 @@ Exports use `{ version: 1, projects: [...] }`. Legacy array backups remain accep
 - The server binds to localhost by default and exposes the entry page, source assets, and public assets. It is a development tool, not a production backend.
 - Native dialogs supply modal behavior and keyboard focus. Controllers manage validation and user actions.
 - Text nodes protect project cards from markup injection. The generated page uses HTML escaping, constrained colors, and a sandboxed preview.
-- Node's test runner verifies model and store behavior. Browser interaction checks remain manual; the unit suite does not claim complete visual or accessibility coverage.
+- Node's test runner verifies model and store behavior. Playwright checks editor workflows on desktop and mobile Chromium, including automated accessibility checks. Manual visual and assistive-technology review remains necessary.
 
 ## Where new work belongs
 
@@ -98,10 +103,18 @@ Exports use `{ version: 1, projects: [...] }`. Legacy array backups remain accep
 
 **A new project action:** put its state transition in `features/projects/store.js`, add a behavioral test, then bind it in the workspace or card.
 
-**Page sections:** introduce a serializable section model, a registry mapping section types to renderers, and tests for each renderer before adding block editing. Keep editor-only selection state out of the exported document.
+**Page sections:** section data and allowed types live in `sections.js`; `render.js` maps those types to exported HTML. `section-controls.js` edits the data through controller callbacks. Add a type to all three boundaries and cover normalization/rendering before adding controls. Keep editor-only state out of the exported document.
 
 **Accounts and shared projects:** add a backend and an asynchronous repository contract. Define ownership, authentication, conflict handling, and failure states before enabling shared writes.
 
 **Publishing:** add a separate publishing service and track publish status. Preview/export should continue working independently of hosting availability.
 
 **A larger interface:** consider a component framework when rendering complexity or repeated state synchronization justifies migration. The domain, normalization, and export modules can remain framework-independent.
+
+## Editing transactions and recovery
+
+`history.js` owns independent website snapshots, capped at 50 past edits. Typing in one field within 700 ms is grouped; structural changes create distinct steps. The controller compares the current snapshot with the saved baseline to determine dirty state. Undoing back to the baseline clears the recovery draft.
+
+`draft-storage.js` stores versioned recovery records per project without replacing the saved website. Opening a project starts a new history and restores a draft when available. Saving only marks the editor clean after the store confirms persistence. Storage failures retain the current session state and keep recovery/export guidance visible. Closing dirty pages is guarded, including Escape and browser unload.
+
+Embedded image sources are restricted to PNG/JPEG/WebP data URLs; external sources require HTTPS without credentials. The renderer escapes all section text and derives navigation from section identifiers. Old websites without sections receive the default services section; explicit empty section arrays remain empty.
