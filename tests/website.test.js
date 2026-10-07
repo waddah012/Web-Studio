@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeWebsite, renderWebsite } from '../src/website.js';
-import { createProjectStore } from '../src/store.js';
+import { normalizeWebsite } from '../src/features/editor/model.js';
+import { renderWebsite } from '../src/features/editor/render.js';
+import { createProjectStore } from '../src/features/projects/store.js';
 test('website export escapes content and rejects unsafe styles and contact URLs', () => {
   const output = renderWebsite('<script>alert(1)</script>', { headline: '<img onerror="bad">', accent: 'red; background:url(evil)', email: 'javascript:alert(1)' });
   assert.ok(!output.includes('<script>'));
@@ -24,4 +25,12 @@ test('website content survives a backup and storage reload', () => {
   assert.equal(createProjectStore(storage).getProjects()[0].website.headline, 'My business');
   store.restore(store.export());
   assert.equal(store.getProjects()[0].website.headline, 'My business');
+});
+
+test('inherited object keys cannot select a website template', () => {
+  for (const template of ['constructor', '__proto__', 'toString']) {
+    const value = normalizeWebsite({ template });
+    assert.equal(value.template, 'studio');
+    assert.equal(typeof value.headline, 'string');
+  }
 });

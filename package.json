@@ -9,7 +9,9 @@
     "build": "node scripts/build.mjs",
     "preview": "node scripts/server.mjs dist",
     "test": "node --test",
-    "check": "node --check src/app.js && node --check src/components.js && node --check src/projects.js && node --check src/store.js && node --check src/website.js && node --check scripts/server.mjs && npm test && npm run build"
+    "check": "node scripts/check.mjs && npm test && npm run build"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": ">=22"
+  }
 }

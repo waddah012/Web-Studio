@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterProjects, loadProjects, starterProjects } from '../src/projects.js';
+import { filterProjects, starterProjects } from '../src/features/projects/model.js';
+import { loadProjects } from '../src/infrastructure/project-storage.js';
 test('search is case insensitive and combines with status', () => {
   assert.equal(filterProjects(starterProjects, '  STUDIO ', 'In progress')[0].id, 'dashboard');
   assert.equal(filterProjects(starterProjects, 'portfolio', 'Ready').length, 0);

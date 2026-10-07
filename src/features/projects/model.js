@@ -10,10 +10,3 @@ export function filterProjects(projects, query, status) {
 export function isProject(project) {
   return Boolean(project && typeof project === 'object' && ['id', 'name', 'description', 'type', 'status', 'theme', 'symbol'].every(key => typeof project[key] === 'string') && project.id.length > 0 && project.id.length <= 100 && project.name.trim().length > 0 && project.name.length <= 60 && project.description.trim().length > 0 && project.description.length <= 180 && ['Website', 'Application', 'Design system'].includes(project.type) && ['In progress', 'Ready'].includes(project.status) && ['lavender', 'peach', 'green'].includes(project.theme) && project.symbol.length <= 10);
 }
-export function loadProjects(storage) {
-  try {
-    const value = JSON.parse(storage.getItem('web-studio-projects'));
-    if (Array.isArray(value) && value.every(isProject) && new Set(value.map(project => project.id)).size === value.length) return value;
-  } catch { /* Fall back to the starter workspace when saved data is unavailable. */ }
-  return structuredClone(starterProjects);
-}

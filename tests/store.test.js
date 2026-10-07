@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createProjectStore, parseBackup } from '../src/store.js';
+import { createProjectStore, parseBackup } from '../src/features/projects/store.js';
 const input = { name: ' New project ', description: ' A useful app ', type: 'Application' };
 function setup() {
   let saved = '[]';
@@ -39,4 +39,12 @@ test('storage failures report recovery guidance and preserve session changes', (
   store.create(input);
   assert.match(message, /Export a backup/);
   assert.equal(store.getProjects().length, 1);
+});
+
+test('backup versions are explicit while legacy arrays remain supported', () => {
+  assert.deepEqual(parseBackup('[]'), []);
+  assert.deepEqual(parseBackup('{"version":1,"projects":[]}'), []);
+  for (const text of ['null', '{"version":2,"projects":[]}', '{"projects":[]}']) {
+    assert.throws(() => parseBackup(text), /Unsupported backup version/);
+  }
 });

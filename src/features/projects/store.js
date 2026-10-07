@@ -1,6 +1,6 @@
-import { normalizeWebsite } from './website.js';
-import { isProject, loadProjects } from './projects.js';
-export const STORAGE_KEY = 'web-studio-projects';
+import { normalizeWebsite } from '../editor/model.js';
+import { isProject } from './model.js';
+import { loadProjects, STORAGE_KEY } from '../../infrastructure/project-storage.js';
 export const PROJECT_TYPES = ['Website', 'Application', 'Design system'];
 export function validateInput(input) {
   const name = String(input.name ?? '').trim();
@@ -12,6 +12,7 @@ export function validateInput(input) {
 }
 export function parseBackup(text) {
   const data = JSON.parse(text);
+  if (!Array.isArray(data) && (!data || data.version !== 1)) throw new Error('Unsupported backup version.');
   const projects = Array.isArray(data) ? data : data.projects;
   if (!Array.isArray(projects) || projects.length > 1000 || !projects.every(isProject)) throw new Error('Choose a valid Web Studio backup with at most 1,000 projects.');
   if (new Set(projects.map(project => project.id)).size !== projects.length) throw new Error('Backup contains duplicate project identifiers.');
