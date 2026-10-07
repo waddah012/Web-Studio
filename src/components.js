@@ -1,0 +1,33 @@
+export function projectCard(project, onToggle) {
+  const article = document.createElement('article');
+  article.className = 'project-card';
+  const visual = document.createElement('div');
+  visual.className = `project-visual ${['lavender', 'peach', 'green'].includes(project.theme) ? project.theme : 'green'}`;
+  const symbol = document.createElement('span');
+  symbol.textContent = project.symbol;
+  visual.append(symbol);
+  const body = document.createElement('div');
+  body.className = 'project-body';
+  const type = document.createElement('p');
+  type.className = 'project-type';
+  type.textContent = project.type;
+  const title = document.createElement('h3');
+  title.textContent = project.name;
+  const description = document.createElement('p');
+  description.className = 'project-description';
+  description.textContent = project.description;
+  const bottom = document.createElement('div');
+  bottom.className = 'project-bottom';
+  const status = document.createElement('span');
+  status.className = `project-status ${project.status === 'Ready' ? 'ready' : ''}`;
+  status.textContent = project.status === 'Ready' ? 'Ready to launch' : project.status;
+  const action = document.createElement('button');
+  action.className = 'project-action';
+  action.textContent = project.status === 'Ready' ? 'Reopen ↗' : 'Mark ready ↗';
+  action.setAttribute('aria-label', `${project.status === 'Ready' ? 'Reopen' : 'Mark ready'}: ${project.name}`);
+  action.addEventListener('click', () => onToggle(project.id));
+  bottom.append(status, action);
+  body.append(type, title, description, bottom);
+  article.append(visual, body);
+  return article;
+}
