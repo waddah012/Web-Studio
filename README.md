@@ -34,7 +34,7 @@ src/styles.css         Design tokens, layouts, and responsive styles
 public/favicon.svg     Web Studio identity
 scripts/server.mjs     Local development and preview server
 scripts/build.mjs      Static production build
-tests/                Native Node.js test suite
+tests/                 Native Node.js test suite
 ```
 
 ## Using the workspace
@@ -52,3 +52,19 @@ The interface uses semantic HTML, native form validation and dialogs, visible ke
 ## Deployment
 
 Run `npm run build`, then publish the contents of `dist/` to a static web host. No server runtime is needed in production. Keep the `src/` and `public/` paths intact. The included server is intended for local development and preview.
+
+## Project management and backups
+
+Use **Edit project** to update a name, description, or type, or delete a project. Sort by name or recently added. **Export backup** downloads your full workspace as JSON. **Import backup** validates the file before asking to replace the current workspace. Backups are limited to 2 MB and 1,000 projects. Keep a backup before importing or deleting.
+
+## Architecture and quality
+
+`src/store.js` owns project mutations, validation, persistence, and subscriptions. Callers receive independent snapshots, so interface code cannot mutate the store accidentally. `projects.js` contains pure queries and saved-record validation; `components.js` renders user content through text nodes. `app.js` binds browser events to these layers. Storage failures keep session data available and prompt you to export it.
+
+GitHub Actions runs the syntax checks, unit tests, and static build on pushes and pull requests. Tests cover project lifecycle, invalid mutations, duplicate imports, backup round trips, storage failure recovery, and filtering. Run `npm run check` before committing.
+
+## Website builder
+
+Choose **Open website editor** on a project. Start from an agency, portfolio, or product template, then edit the headline, tagline, description, contact button, email, and colors. The sandboxed live preview supports desktop and mobile widths. **Save website** persists the page in your workspace; **Export HTML** downloads a standalone `index.html` with embedded styles, ready for static hosting. Workspace backups include saved website content.
+
+The builder currently produces a single landing page with a fixed three-section layout. It does not provide drag-and-drop blocks, multiple pages, hosting, or collaborative editing. Website content is escaped before rendering, colors are validated, and exported contact links accept email addresses only.

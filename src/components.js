@@ -1,4 +1,4 @@
-export function projectCard(project, onToggle) {
+export function projectCard(project, onToggle, onEdit, onBuild) {
   const article = document.createElement('article');
   article.className = 'project-card';
   const visual = document.createElement('div');
@@ -27,7 +27,16 @@ export function projectCard(project, onToggle) {
   action.setAttribute('aria-label', `${project.status === 'Ready' ? 'Reopen' : 'Mark ready'}: ${project.name}`);
   action.addEventListener('click', () => onToggle(project.id));
   bottom.append(status, action);
-  body.append(type, title, description, bottom);
+  const edit = document.createElement('button');
+  edit.className = 'edit-project';
+  edit.textContent = 'Edit project';
+  edit.setAttribute('aria-label', `Edit ${project.name}`);
+  edit.addEventListener('click', () => onEdit(project.id));
+  const build = document.createElement('button');
+  build.className = 'edit-project build-project';
+  build.textContent = 'Open website editor ↗';
+  build.addEventListener('click', () => onBuild(project.id));
+  body.append(type, title, description, build, edit, bottom);
   article.append(visual, body);
   return article;
 }
